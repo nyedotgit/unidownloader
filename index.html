@@ -34,11 +34,11 @@
     <!-- Status Server -->
     <div class="mb-4 bg-slate-950/50 border border-slate-800 rounded-xl p-3 flex justify-around text-xs">
       <div class="flex items-center gap-2">
-        <span class="text-slate-400">PC 1:</span>
+        <span class="text-slate-400">SERVER 1 :</span>
         <span id="statusPc1" class="px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-500 animate-pulse">CHECKING</span>
       </div>
       <div class="flex items-center gap-2">
-        <span class="text-slate-400">PC 2:</span>
+        <span class="text-slate-400">SERVER 2 :</span>
         <span id="statusPc2" class="px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-500 animate-pulse">CHECKING</span>
       </div>
     </div>
@@ -110,8 +110,8 @@
   </div>
 
   <script>
-    const PC1_URL = "https://idealness-endorphin-unfeeling.ngrok-free.dev"; 
-    const PC2_URL = "https://MASUKKAN-URL-NGROK-PC2-DISINI.ngrok-free.dev"; 
+    const PC1_URL = "https://dweller-dollar-available.ngrok-free.dev";
+    const PC2_URL = "https://idealness-endorphin-unfeeling.ngrok-free.dev";
 
     let pc1Online = false;
     let pc2Online = false;
@@ -163,12 +163,12 @@
 
       if (pc1Online) {
         activeServer = PC1_URL;
-        loaderText.innerText = "Memproses lewat PC 1...";
+        loaderText.innerText = "Memproses lewat SERVER 1...";
       } else if (pc2Online) {
         activeServer = PC2_URL;
-        loaderText.innerText = "Memproses lewat PC 2...";
+        loaderText.innerText = "Memproses lewat SERVER 2...";
       } else {
-        alert("Kedua server PC kamu sedang OFFLINE.");
+        alert("Kedua server SERVER kamu sedang OFFLINE.");
         return;
       }
 
