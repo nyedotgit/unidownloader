@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Universal Media Downloader</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #090d16 0%, #111827 50%, #090d16 100%); }
+    .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+    .glow-input:focus { box-shadow: 0 0 25px rgba(59, 130, 246, 0.2); }
+    .spinner { width: 40px; height: 40px; border: 3px solid rgba(59, 130, 246, 0.1); border-radius: 50%; border-top-color: #3b82f6; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4 text-slate-100">
+
+  <div class="glass-card w-full max-w-xl rounded-2xl p-6 sm:p-8 shadow-2xl">
+    
+    <!-- Header -->
+    <div class="flex flex-col items-center mb-6 text-center">
+      <div class="w-16 h-16 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mb-4">
+        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-extrabold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent tracking-tight">
+        Universal Media Downloader
+      </h1>
+      <p class="text-slate-400 text-xs mt-1 font-light">Hosted on GitHub Pages - Bebas Iklan & Pelacakan.</p>
+    </div>
+
+    <!-- Supported Platforms -->
+    <div class="mb-8 bg-slate-950/40 border border-slate-800/80 rounded-xl p-3">
+      <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center text-[11px] font-medium">
+        <span class="px-2 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">YouTube</span>
+        <span class="px-2 py-1.5 rounded-lg bg-slate-100/10 border border-slate-100/20 text-slate-200">TikTok</span>
+        <span class="px-2 py-1.5 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400">Instagram</span>
+        <span class="px-2 py-1.5 rounded-lg bg-blue-600/10 border border-blue-600/20 text-blue-400">Facebook</span>
+        <span class="px-2 py-1.5 rounded-lg bg-indigo-400/10 border border-indigo-400/20 text-indigo-400">Twitter / X</span>
+        <span class="px-2 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400">Twitch</span>
+      </div>
+    </div>
+
+    <!-- Input Form -->
+    <div class="space-y-4">
+      <div>
+        <label for="videoUrl" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Tempel Link Video / Audio</label>
+        <input type="text" id="videoUrl" placeholder="Tempel link video disini..." class="glow-input w-full bg-slate-950/40 border border-slate-800/80 rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/70">
+      </div>
+      <button id="btnDownload" onclick="generateLink()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm py-3.5 rounded-xl transition-all active:scale-[0.99] disabled:opacity-50">
+        Analisis Media & Kualitas
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div id="loader" class="hidden flex flex-col items-center justify-center py-8 space-y-3">
+      <div class="spinner"></div>
+      <p class="text-xs text-slate-400 animate-pulse">Sedang membedah media melalui PC lokal...</p>
+    </div>
+
+    <!-- Hasil Sukses -->
+    <div id="resultArea" class="hidden mt-6">
+      <div class="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4 flex flex-col space-y-4">
+        <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+          <img id="videoThumb" src="" class="w-32 h-20 object-cover rounded-lg bg-slate-800 border border-slate-700 shadow-md" alt="Thumbnail">
+          <div class="flex-1 text-center sm:text-left min-w-0">
+            <h3 id="videoTitle" class="text-sm font-semibold text-white line-clamp-2">Judul Media</h3>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <label for="qualitySelect" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">Pilih Opsi Unduhan:</label>
+          <select id="qualitySelect" onchange="updateDownloadLink()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"></select>
+        </div>
+        <div class="border-t border-slate-800/80 pt-3">
+          <a id="downloadBtn" href="#" target="_blank" class="block w-full text-center bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-medium text-sm py-3 rounded-xl transition-all shadow-lg active:scale-[0.99]">Klik untuk Unduh Media</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Box -->
+    <div id="errorArea" class="hidden mt-6">
+      <div class="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 text-xs text-slate-300" id="errorMsg"></div>
+    </div>
+
+    <!-- Donasi -->
+    <div class="mt-8 border-t border-slate-800/60 pt-4">
+      <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
+        <a href="https://saweria.co/dine87" target="_blank" class="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-950 font-medium text-xs transition-all active:scale-[0.97]"><span>☕ Saweria</span></a>
+        <a href="https://trakteer.id/nyedot_donk/tip" target="_blank" class="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-slate-950 font-medium text-xs transition-all active:scale-[0.97]"><span>🌶️ Trakteer</span></a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ⚠️ MASUKKAN URL NGROK KAMU YANG AKTIF DI SINI! (Jangan lupa akhiri dengan /get-link)
+    const NGROK_URL = "https://dweller-dollar-available.ngrok-free.dev/get-link"; 
+
+    function generateLink() {
+      var url = document.getElementById('videoUrl').value.trim();
+      var btn = document.getElementById('btnDownload');
+      var loader = document.getElementById('loader');
+      var resultArea = document.getElementById('resultArea');
+      var errorArea = document.getElementById('errorArea');
+
+      if (!url) { alert('Masukkan link media terlebih dahulu!'); return; }
+
+      btn.disabled = true;
+      loader.classList.remove('hidden');
+      resultArea.classList.add('hidden');
+      errorArea.classList.add('hidden');
+
+      // PERUBAHAN UTAMA: Menggunakan standard fetch() API langsung ke Ngrok PC
+      fetch(NGROK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
+        },
+        body: JSON.stringify({ url: url })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Server PC merespon dengan error.');
+        return response.json();
+      })
+      .then(data => {
+        btn.disabled = false;
+        loader.classList.add('hidden');
+        
+        if (data.success) {
+          document.getElementById('videoTitle').innerText = data.title;
+          document.getElementById('videoThumb').src = data.thumbnail || 'https://via.placeholder.com/120x80?text=No+Image';
+          
+          var select = document.getElementById('qualitySelect');
+          select.innerHTML = ''; 
+          
+          data.formats.forEach(function(item) {
+            var option = document.createElement('option');
+            option.value = item.url; 
+            option.text = item.quality;
+            select.appendChild(option);
+          });
+          
+          updateDownloadLink();
+          resultArea.classList.remove('hidden');
+        } else {
+          document.getElementById('errorMsg').innerText = data.message;
+          errorArea.classList.remove('hidden');
+        }
+      })
+      .catch(error => {
+        btn.disabled = false;
+        loader.classList.add('hidden');
+        document.getElementById('errorMsg').innerText = 'Gagal terhubung ke PC lokal. Pastikan server Python & Ngrok menyala.';
+        errorArea.classList.remove('hidden');
+      });
+    }
+
+    function updateDownloadLink() {
+      var select = document.getElementById('qualitySelect');
+      var downloadBtn = document.getElementById('downloadBtn');
+      downloadBtn.href = select.value;
+    }
+  </script>
+</body>
+</html>
