@@ -28,11 +28,23 @@
       <h1 class="text-2xl font-extrabold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent tracking-tight">
         Universal Media Downloader
       </h1>
-      <p class="text-slate-400 text-xs mt-1 font-light">Hosted on GitHub Pages - Bebas Iklan & Pelacakan.</p>
+      <p class="text-slate-400 text-xs mt-1 font-light">Sistem Dual Server Aktif (GitHub Pages)</p>
+    </div>
+
+    <!-- BAGIAN BARU: Live Status Monitor Server -->
+    <div class="mb-4 bg-slate-950/50 border border-slate-800 rounded-xl p-3 flex justify-around text-xs">
+      <div class="flex items-center gap-2">
+        <span class="text-slate-400">PC 1 (Utama):</span>
+        <span id="statusPc1" class="px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-500 animate-pulse">CHECKING</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-slate-400">PC 2 (Cadangan):</span>
+        <span id="statusPc2" class="px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-500 animate-pulse">CHECKING</span>
+      </div>
     </div>
 
     <!-- Supported Platforms -->
-    <div class="mb-8 bg-slate-950/40 border border-slate-800/80 rounded-xl p-3">
+    <div class="mb-6 bg-slate-950/40 border border-slate-800/80 rounded-xl p-3">
       <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center text-[11px] font-medium">
         <span class="px-2 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">YouTube</span>
         <span class="px-2 py-1.5 rounded-lg bg-slate-100/10 border border-slate-100/20 text-slate-200">TikTok</span>
@@ -57,7 +69,7 @@
     <!-- Loading -->
     <div id="loader" class="hidden flex flex-col items-center justify-center py-8 space-y-3">
       <div class="spinner"></div>
-      <p class="text-xs text-slate-400 animate-pulse">Sedang membedah media melalui PC lokal...</p>
+      <p id="loaderText" class="text-xs text-slate-400 animate-pulse">Sedang membedah media...</p>
     </div>
 
     <!-- Hasil Sukses -->
@@ -84,15 +96,11 @@
       <div class="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 text-xs text-slate-300" id="errorMsg"></div>
     </div>
 
-    <!-- Bagian Donasi + Teks Kustom Baru -->
+    <!-- Bagian Donasi -->
     <div class="mt-8 border-t border-slate-800/60 pt-4 text-center">
-      <!-- Teks Kustom diatas tombol -->
       <p class="text-xs font-semibold tracking-wide text-slate-400 mb-3">234 + Liong Bulan</p>
-      
       <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
-        <!-- Saweria -->
         <a href="https://saweria.co/dine87" target="_blank" class="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-950 font-medium text-xs transition-all active:scale-[0.97]"><span>☕ Saweria</span></a>
-        <!-- Trakteer -->
         <a href="https://trakteer.id/nyedot_donk/tip" target="_blank" class="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-slate-950 font-medium text-xs transition-all active:scale-[0.97]"><span>🌶️ Trakteer</span></a>
       </div>
     </div>
@@ -100,8 +108,50 @@
   </div>
 
   <script>
-    // ⚠️ MASUKKAN URL NGROK KAMU YANG AKTIF DI SINI! (Jangan lupa akhiri dengan /get-link)
-    const NGROK_URL = "https://dweller-dollar-available.ngrok-free.dev/get-link"; 
+    // ⚠️ MASUKKAN MASING-MASING URL NGROK KAMU DI SINI
+    const PC1_URL = "https://dweller-dollar-available.ngrok-free.dev"; 
+    const PC2_URL = "https://MASUKKAN-URL-NGROK-PC2-DISINI.ngrok-free.dev"; 
+
+    let pc1Online = false;
+    let pc2Online = false;
+
+    // Fungsi otomatis untuk memeriksa kesehatan server saat halaman dimuat
+    function checkServerStatus() {
+      // Cek PC 1
+      fetch(`${PC1_URL}/ping`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
+        .then(res => res.json())
+        .then(data => {
+          if(data.status === 'online') {
+            pc1Online = true;
+            document.getElementById('statusPc1').className = "px-2 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 text-[10px]";
+            document.getElementById('statusPc1').innerText = "ONLINE";
+          }
+        })
+        .catch(() => {
+          pc1Online = false;
+          document.getElementById('statusPc1').className = "px-2 py-0.5 rounded font-bold bg-rose-500/10 text-rose-400 text-[10px]";
+          document.getElementById('statusPc1').innerText = "OFFLINE";
+        });
+
+      // Cek PC 2
+      fetch(`${PC2_URL}/ping`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
+        .then(res => res.json())
+        .then(data => {
+          if(data.status === 'online') {
+            pc2Online = true;
+            document.getElementById('statusPc2').className = "px-2 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 text-[10px]";
+            document.getElementById('statusPc2').innerText = "ONLINE";
+          }
+        })
+        .catch(() => {
+          pc2Online = false;
+          document.getElementById('statusPc2').className = "px-2 py-0.5 rounded font-bold bg-rose-500/10 text-rose-400 text-[10px]";
+          document.getElementById('statusPc2').innerText = "OFFLINE";
+        });
+    }
+
+    // Jalankan pengecekan secara berkala saat aplikasi dibuka
+    window.onload = checkServerStatus;
 
     function generateLink() {
       var url = document.getElementById('videoUrl').value.trim();
@@ -109,15 +159,29 @@
       var loader = document.getElementById('loader');
       var resultArea = document.getElementById('resultArea');
       var errorArea = document.getElementById('errorArea');
+      var loaderText = document.getElementById('loaderText');
 
       if (!url) { alert('Masukkan link media terlebih dahulu!'); return; }
+
+      // Logika Penentuan Jalur: Pilih PC yang berstatus ONLINE
+      let targetServer = "";
+      if (pc1Online) {
+        targetServer = PC1_URL;
+        loaderText.innerText = "Memproses lewat PC 1 (Utama)...";
+      } else if (pc2Online) {
+        targetServer = PC2_URL;
+        loaderText.innerText = "PC 1 Offline. Memproses lewat PC 2 (Cadangan)...";
+      } else {
+        alert("Waduh! Kedua server PC kamu sedang OFFLINE. Nyalakan salah satu PC dan jalankan Python + Ngrok.");
+        return;
+      }
 
       btn.disabled = true;
       loader.classList.remove('hidden');
       resultArea.classList.add('hidden');
       errorArea.classList.add('hidden');
 
-      fetch(NGROK_URL, {
+      fetch(`${targetServer}/get-link`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -157,8 +221,9 @@
       .catch(error => {
         btn.disabled = false;
         loader.classList.add('hidden');
-        document.getElementById('errorMsg').innerText = 'Gagal terhubung ke PC lokal. Pastikan server Python & Ngrok menyala.';
+        document.getElementById('errorMsg').innerText = 'Gagal memproses media. Server target mendadak terputus.';
         errorArea.classList.remove('hidden');
+        checkServerStatus(); // Segarkan status server
       });
     }
 
