@@ -28,17 +28,17 @@
       <h1 class="text-2xl font-extrabold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent tracking-tight">
         Universal Media Downloader
       </h1>
-      <p class="text-slate-400 text-xs mt-1 font-light">Tinggal Tempel, Langsung Sedot</p>
+      <p class="text-slate-400 text-xs mt-1 font-light">Anti-Block TikTok & IG Engine</p>
     </div>
 
-    <!-- BAGIAN BARU: Live Status Monitor Server -->
+    <!-- Status Server -->
     <div class="mb-4 bg-slate-950/50 border border-slate-800 rounded-xl p-3 flex justify-around text-xs">
       <div class="flex items-center gap-2">
-        <span class="text-slate-400">SERVER 1 :</span>
+        <span class="text-slate-400">PC 1:</span>
         <span id="statusPc1" class="px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-500 animate-pulse">CHECKING</span>
       </div>
       <div class="flex items-center gap-2">
-        <span class="text-slate-400">SERVER 2 :</span>
+        <span class="text-slate-400">PC 2:</span>
         <span id="statusPc2" class="px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-500 animate-pulse">CHECKING</span>
       </div>
     </div>
@@ -83,10 +83,12 @@
         </div>
         <div class="space-y-2">
           <label for="qualitySelect" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">Pilih Opsi Unduhan:</label>
-          <select id="qualitySelect" onchange="updateDownloadLink()" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"></select>
+          <select id="qualitySelect" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"></select>
         </div>
         <div class="border-t border-slate-800/80 pt-3">
-          <a id="downloadBtn" href="#" target="_blank" class="block w-full text-center bg-gradient-to-r from-emerald-600 to-teal-500 text-white font-medium text-sm py-3 rounded-xl transition-all shadow-lg active:scale-[0.99]">Klik untuk Unduh Media</a>
+          <button onclick="startDownload()" id="downloadBtn" class="w-full text-center bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-medium text-sm py-3 rounded-xl transition-all shadow-lg active:scale-[0.99] disabled:opacity-50">
+            Klik untuk Unduh Media
+          </button>
         </div>
       </div>
     </div>
@@ -96,11 +98,11 @@
       <div class="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 text-xs text-slate-300" id="errorMsg"></div>
     </div>
 
-    <!-- Bagian Donasi -->
+    <!-- Donasi -->
     <div class="mt-8 border-t border-slate-800/60 pt-4 text-center">
       <p class="text-xs font-semibold tracking-wide text-slate-400 mb-3">234 + Liong Bulan</p>
       <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
-        <a href="https://saweria.co/NyedotDonk" target="_blank" class="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-950 font-medium text-xs transition-all active:scale-[0.97]"><span>☕ Saweria</span></a>
+        <a href="https://saweria.co/dine87" target="_blank" class="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-950 font-medium text-xs transition-all active:scale-[0.97]"><span>☕ Saweria</span></a>
         <a href="https://trakteer.id/nyedot_donk/tip" target="_blank" class="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-slate-950 font-medium text-xs transition-all active:scale-[0.97]"><span>🌶️ Trakteer</span></a>
       </div>
     </div>
@@ -108,16 +110,14 @@
   </div>
 
   <script>
-    // ⚠️ MASUKKAN MASING-MASING URL NGROK KAMU DI SINI
-    const PC1_URL = "https://dweller-dollar-available.ngrok-free.dev"; 
-    const PC2_URL = "https://idealness-endorphin-unfeeling.ngrok-free.dev"; 
+    const PC1_URL = "https://idealness-endorphin-unfeeling.ngrok-free.dev"; 
+    const PC2_URL = "https://MASUKKAN-URL-NGROK-PC2-DISINI.ngrok-free.dev"; 
 
     let pc1Online = false;
     let pc2Online = false;
+    let activeServer = "";
 
-    // Fungsi otomatis untuk memeriksa kesehatan server saat halaman dimuat
     function checkServerStatus() {
-      // Cek PC 1
       fetch(`${PC1_URL}/ping`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
         .then(res => res.json())
         .then(data => {
@@ -133,7 +133,6 @@
           document.getElementById('statusPc1').innerText = "OFFLINE";
         });
 
-      // Cek PC 2
       fetch(`${PC2_URL}/ping`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
         .then(res => res.json())
         .then(data => {
@@ -150,7 +149,6 @@
         });
     }
 
-    // Jalankan pengecekan secara berkala saat aplikasi dibuka
     window.onload = checkServerStatus;
 
     function generateLink() {
@@ -163,16 +161,14 @@
 
       if (!url) { alert('Masukkan link media terlebih dahulu!'); return; }
 
-      // Logika Penentuan Jalur: Pilih PC yang berstatus ONLINE
-      let targetServer = "";
       if (pc1Online) {
-        targetServer = PC1_URL;
-        loaderText.innerText = "Memproses lewat PC 1 (Utama)...";
+        activeServer = PC1_URL;
+        loaderText.innerText = "Memproses lewat PC 1...";
       } else if (pc2Online) {
-        targetServer = PC2_URL;
-        loaderText.innerText = "PC 1 Offline. Memproses lewat PC 2 (Cadangan)...";
+        activeServer = PC2_URL;
+        loaderText.innerText = "Memproses lewat PC 2...";
       } else {
-        alert("Waduh! Kedua server PC kamu sedang OFFLINE. Nyalakan salah satu PC dan jalankan Python + Ngrok.");
+        alert("Kedua server PC kamu sedang OFFLINE.");
         return;
       }
 
@@ -181,7 +177,7 @@
       resultArea.classList.add('hidden');
       errorArea.classList.add('hidden');
 
-      fetch(`${targetServer}/get-link`, {
+      fetch(`${activeServer}/get-link`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -190,7 +186,7 @@
         body: JSON.stringify({ url: url })
       })
       .then(response => {
-        if (!response.ok) throw new Error('Server PC merespon dengan error.');
+        if (!response.ok) throw new Error('Server merespon dengan error.');
         return response.json();
       })
       .then(data => {
@@ -206,31 +202,64 @@
           
           data.formats.forEach(function(item) {
             var option = document.createElement('option');
-            option.value = item.url; 
+            option.value = item.format_id; 
             option.text = item.quality;
             select.appendChild(option);
           });
           
-          updateDownloadLink();
           resultArea.classList.remove('hidden');
         } else {
           document.getElementById('errorMsg').innerText = data.message;
+          errorArea.classList.add('hidden'); // Fix toggle
           errorArea.classList.remove('hidden');
         }
       })
-      .catch(error => {
+      .catch(() => {
         btn.disabled = false;
         loader.classList.add('hidden');
-        document.getElementById('errorMsg').innerText = 'Gagal memproses media. Server target mendadak terputus.';
+        document.getElementById('errorMsg').innerText = 'Gagal terhubung ke server.';
         errorArea.classList.remove('hidden');
-        checkServerStatus(); // Segarkan status server
+        checkServerStatus();
       });
     }
 
-    function updateDownloadLink() {
-      var select = document.getElementById('qualitySelect');
-      var downloadBtn = document.getElementById('downloadBtn');
-      downloadBtn.href = select.value;
+    function startDownload() {
+      var url = document.getElementById('videoUrl').value.trim();
+      var formatId = document.getElementById('qualitySelect').value;
+      var dBtn = document.getElementById('downloadBtn');
+
+      dBtn.disabled = true;
+      dBtn.innerText = "Sedang Mengunduh dari Server...";
+
+      fetch(`${activeServer}/download`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'ngrok-skip-browser-warning': 'true'
+        },
+        body: JSON.stringify({ url: url, format_id: formatId })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Gagal mengunduh file.');
+        return response.blob();
+      })
+      .then(blob => {
+        var blobUrl = window.URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = blobUrl;
+        a.download = "media_downloaded.mp4";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        
+        dBtn.disabled = false;
+        dBtn.innerText = "Klik untuk Unduh Media";
+      })
+      .catch(() => {
+        alert("Gagal mengunduh file dari server.");
+        dBtn.disabled = false;
+        dBtn.innerText = "Klik untuk Unduh Media";
+      });
     }
   </script>
 </body>
