@@ -3,264 +3,259 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Universal Media Downloader</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta name="referrer" content="no-referrer">
+  <meta name="description" content="Siapkan unduhan dari tautan file langsung. File diambil browser langsung dari sumbernya.">
+  <title>Unduh File Langsung</title>
   <style>
-    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #090d16 0%, #111827 50%, #090d16 100%); }
-    .glass-card { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
-    .glow-input:focus { box-shadow: 0 0 25px rgba(59, 130, 246, 0.2); }
-    .spinner { width: 40px; height: 40px; border: 3px solid rgba(59, 130, 246, 0.1); border-radius: 50%; border-top-color: #3b82f6; animation: spin 0.8s linear infinite; }
+    :root { color-scheme: dark; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: #e8edf7; background: #090e19; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; padding: 40px 18px; background: radial-gradient(ellipse at 50% 0, #182945, transparent 65%); }
+    main { max-width: 620px; margin: auto; background: #111b2bea; border: 1px solid #29364d; border-radius: 24px; padding: 32px; box-shadow: 0 24px 80px #0004; }
+    header { text-align: center; }
+    .icon { display: grid; place-items: center; width: 60px; height: 60px; margin: 0 auto 18px; background: #213b60; color: #7db9ff; border-radius: 18px; }
+    h1 { font-size: clamp(1.5rem, 5vw, 1.9rem); margin: 0 0 10px; letter-spacing: -.04em; }
+    h2 { font-size: 1rem; margin: 0; overflow-wrap: anywhere; }
+    p { line-height: 1.65; }
+    .muted { color: #aab8cf; }
+    .small { font-size: .8rem; }
+    .subtitle { margin: 0 auto; max-width: 440px; font-size: .9rem; }
+    .formats { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 22px 0 28px; }
+    .tag { font-size: .72rem; padding: 5px 10px; color: #b8d7fd; background: #1c2d46; border: 1px solid #304565; border-radius: 7px; }
+    label { display: block; font-weight: 600; font-size: .83rem; margin: 0 0 9px; }
+    input { width: 100%; font: inherit; font-size: .88rem; color: #f4f7ff; background: #0b1321; border: 1px solid #35445f; border-radius: 11px; padding: 14px; }
+    input::placeholder { color: #8394af; }
+    input:focus, button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid #7db9ff; outline-offset: 3px; }
+    button, .button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 12px 16px; border: 0; border-radius: 11px; font: inherit; font-size: .88rem; font-weight: 650; text-decoration: none; cursor: pointer; }
+    .primary { width: 100%; background: #447de9; color: white; margin-top: 14px; }
+    .primary:hover { background: #568ef8; }
+    button:disabled, input:disabled { opacity: .55; cursor: wait; }
+    .help { margin: 9px 0 0; font-size: .77rem; color: #aab8cf; }
+    .loading { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 24px 0 4px; font-size: .85rem; color: #b8d7fd; }
+    .spinner { width: 22px; height: 22px; border: 2px solid #29446c; border-top-color: #89b9ff; border-radius: 50%; animation: spin .8s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
+    [hidden] { display: none !important; }
+    .result { margin-top: 24px; padding: 20px; border: 1px solid #34615a; border-radius: 14px; background: #102b2a; }
+    .result-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .eyebrow { color: #8fe1c4; font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    #fileKind { font-size: .75rem; color: #adcfcc; }
+    #fileHost { overflow-wrap: anywhere; margin: 5px 0 12px; font-size: .8rem; color: #adcfcc; }
+    #fileNote { font-size: .77rem; color: #adcfcc; margin-bottom: 16px; }
+    .actions { display: flex; gap: 9px; flex-wrap: wrap; }
+    .download { flex: 1; background: #74ddba; color: #09271e; }
+    .secondary { background: #24384c; color: #e3ecf9; }
+    .save-help { font-size: .78rem; color: #b8d4ca; margin-bottom: 0; }
+    .error { margin-top: 20px; padding: 14px; background: #3b2029; border: 1px solid #71404d; border-radius: 11px; color: #ffd0d8; font-size: .84rem; line-height: 1.6; overflow-wrap: anywhere; }
+    details { margin-top: 28px; border-top: 1px solid #2b394f; padding-top: 18px; }
+    summary { display: flex; justify-content: space-between; gap: 12px; cursor: pointer; font-size: .8rem; color: #b4c4dc; list-style: none; }
+    summary::-webkit-details-marker { display: none; }
+    #connectionStatus { font-size: .72rem; color: #8ca2c3; }
+    #settingsForm { margin-top: 20px; }
+    #settingsForm button { margin-top: 12px; }
+    footer { margin-top: 26px; text-align: center; border-top: 1px solid #2b394f; padding-top: 18px; }
+    footer p { margin: 0 0 10px; font-size: .75rem; color: #8fa2c0; }
+    footer a { color: #bdcfe9; font-size: .8rem; margin: 0 10px; }
+    @media (max-width: 480px) { body { padding: 18px 12px; } main { padding: 24px 18px; } .actions { flex-direction: column; } }
+    @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
   </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 text-slate-100">
-
-  <div class="glass-card w-full max-w-xl rounded-2xl p-6 sm:p-8 shadow-2xl">
-    
-    <!-- Header -->
-    <div class="flex flex-col items-center mb-6 text-center">
-      <div class="w-16 h-16 bg-blue-500/10 border border-blue-500/20 rounded-2xl flex items-center justify-center mb-4">
-        <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"/>
-        </svg>
+<body>
+  <main>
+    <header>
+      <div class="icon" aria-hidden="true"><svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg></div>
+      <h1>Unduh File Langsung</h1>
+      <p class="subtitle muted">Tempel tautan file, lalu buka atau simpan dari sumbernya. Tanpa aplikasi tambahan.</p>
+      <div class="formats" aria-label="Contoh jenis file"><span class="tag">MP4 / WEBM</span><span class="tag">MP3 / M4A</span><span class="tag">PDF</span><span class="tag">GAMBAR</span><span class="tag">ZIP</span></div>
+    </header>
+    <form id="fileForm" novalidate>
+      <label for="fileUrl">Tautan file langsung</label>
+      <input type="url" id="fileUrl" inputmode="url" autocomplete="off" spellcheck="false" maxlength="8192" placeholder="https://contoh.com/video.mp4" aria-describedby="urlHelp" required>
+      <p class="help" id="urlHelp">Gunakan alamat file, bukan halaman YouTube, Instagram, TikTok, atau postingan media sosial.</p>
+      <button id="prepareBtn" class="primary" type="submit">Siapkan Unduhan</button>
+    </form>
+    <div id="loader" class="loading" role="status" hidden><span class="spinner" aria-hidden="true"></span><span id="loaderText">Menyiapkan tautan...</span></div>
+    <section id="resultArea" class="result" aria-live="polite" hidden>
+      <div class="result-top"><span class="eyebrow">Tautan siap dibuka</span><span id="fileKind"></span></div>
+      <h2 id="fileName"></h2>
+      <p id="fileHost"></p>
+      <p id="fileNote"></p>
+      <div class="actions">
+        <a id="downloadBtn" class="button download" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">Buka / Unduh File</a>
+        <button id="copyBtn" class="secondary" type="button">Salin Tautan</button>
       </div>
-      <h1 class="text-2xl font-extrabold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent tracking-tight">
-        Universal Media Downloader
-      </h1>
-      <p class="text-slate-400 text-xs mt-1 font-light">Tanpa Watermark - Tinggal Tempel, Langsung Sedot</p>
-    </div>
+      <p class="save-help">Jika file terbuka di tab baru, gunakan menu unduh pada pemutar/PDF atau “Simpan sebagai” di browser. Tautan kedaluwarsa atau file privat mungkin tidak dapat dibuka.</p>
+      <p id="copyStatus" class="small" role="status"></p>
+    </section>
+    <div id="errorArea" class="error" role="alert" hidden><span id="errorMsg"></span></div>
+    <details id="settings">
+      <summary><span>Pengaturan koneksi ▾</span><span id="connectionStatus">Belum diatur</span></summary>
+      <form id="settingsForm" novalidate>
+        <label for="gasEndpoint">Alamat Web App Google Apps Script</label>
+        <input type="url" id="gasEndpoint" autocomplete="off" spellcheck="false" placeholder="https://script.google.com/macros/s/.../exec">
+        <p class="help">Diisi oleh pemilik aplikasi. Alamat disimpan hanya di browser ini. Tautan file yang Anda masukkan tidak disimpan oleh aplikasi.</p>
+        <button id="saveSettings" type="submit" class="secondary">Simpan &amp; Cek Koneksi</button>
+      </form>
+    </details>
+    <footer>
+      <p>234 + Liong Bulan</p>
+      <a href="https://saweria.co/dine87" target="_blank" rel="noopener noreferrer">☕ Saweria</a>
+      <a href="https://trakteer.id/nyedot_donk/tip" target="_blank" rel="noopener noreferrer">🌶️ Trakteer</a>
+    </footer>
+  </main>
+  <script src="config.js"></script>
+  <script id="app-code">
+const el = id => document.getElementById(id);
+const STORAGE_KEY = 'direct-file-gas-url';
+let busy = false;
+let prepared = null;
+let gasUrl = '';
 
-    <!-- Status Server -->
-    <div class="mb-4 bg-slate-950/50 border border-slate-800 rounded-xl p-3 flex justify-around text-xs">
-      <div class="flex items-center gap-2">
-        <span class="text-slate-400">SERVER 1 :</span>
-        <span id="statusPc1" class="px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-500 animate-pulse">CHECKING</span>
-      </div>
-      <div class="flex items-center gap-2">
-        <span class="text-slate-400">SERVER 2 :</span>
-        <span id="statusPc2" class="px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-500 animate-pulse">CHECKING</span>
-      </div>
-    </div>
+function validateEndpoint(value) {
+  const input = value.trim();
+  if (!/^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(input)) {
+    throw new Error('Gunakan URL deployment GAS: https://script.google.com/macros/s/.../exec');
+  }
+  return input;
+}
 
-    <!-- Supported Platforms -->
-    <div class="mb-6 bg-slate-950/40 border border-slate-800/80 rounded-xl p-3">
-      <div class="grid grid-cols-3 sm:grid-cols-6 gap-2 text-center text-[11px] font-medium">
-        <span class="px-2 py-1.5 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400">YouTube</span>
-        <span class="px-2 py-1.5 rounded-lg bg-slate-100/10 border border-slate-100/20 text-slate-200">TikTok</span>
-        <span class="px-2 py-1.5 rounded-lg bg-pink-500/10 border border-pink-500/20 text-pink-400">Instagram</span>
-        <span class="px-2 py-1.5 rounded-lg bg-blue-600/10 border border-blue-600/20 text-blue-400">Facebook</span>
-        <span class="px-2 py-1.5 rounded-lg bg-indigo-400/10 border border-indigo-400/20 text-indigo-400">Twitter / X</span>
-        <span class="px-2 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-purple-400">Twitch</span>
-      </div>
-    </div>
+function inputUrl(value) {
+  const input = value.trim();
+  if (!input || input.length > 8192 || /[\s\\\x00-\x1f\x7f]/.test(input)) {
+    throw new Error('Masukkan tautan file yang valid; gunakan %20 untuk spasi.');
+  }
+  let parsed;
+  try { parsed = new URL(input); } catch (_) { throw new Error('Alamat file tidak valid.'); }
+  if (!['https:', 'http:'].includes(parsed.protocol) || parsed.username || parsed.password) {
+    throw new Error('Gunakan tautan HTTP atau HTTPS tanpa nama pengguna/kata sandi.');
+  }
+  return input;
+}
 
-    <!-- Input Form -->
-    <div class="space-y-4">
-      <div>
-        <label for="videoUrl" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">Tempel Link Video / Audio</label>
-        <input type="text" id="videoUrl" placeholder="Tempel link video disini..." class="glow-input w-full bg-slate-950/40 border border-slate-800/80 rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/70">
-      </div>
-      <button id="btnDownload" onclick="generateLink()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold text-sm py-3.5 rounded-xl transition-all active:scale-[0.99] disabled:opacity-50">
-        Analisis Media & Kualitas
-      </button>
-    </div>
+function showError(message) {
+  el('errorMsg').textContent = message;
+  el('errorArea').hidden = false;
+}
 
-    <!-- Loading -->
-    <div id="loader" class="hidden flex flex-col items-center justify-center py-8 space-y-3">
-      <div class="spinner"></div>
-      <p id="loaderText" class="text-xs text-slate-400 animate-pulse">Sedang membedah media...</p>
-    </div>
+function clearResult() {
+  prepared = null;
+  el('resultArea').hidden = true;
+  el('downloadBtn').removeAttribute('href');
+  el('downloadBtn').removeAttribute('download');
+  el('copyStatus').textContent = '';
+}
 
-    <!-- Hasil Sukses -->
-    <div id="resultArea" class="hidden mt-6">
-      <div class="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4 flex flex-col space-y-4">
-        <div class="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
-          <img id="videoThumb" src="" class="w-32 h-20 object-cover rounded-lg bg-slate-800 border border-slate-700 shadow-md" alt="Thumbnail">
-          <div class="flex-1 text-center sm:text-left min-w-0">
-            <h3 id="videoTitle" class="text-sm font-semibold text-white line-clamp-2">Judul Media</h3>
-          </div>
-        </div>
-        <div class="space-y-2">
-          <label for="qualitySelect" class="block text-[11px] font-semibold uppercase tracking-wider text-slate-400">Pilih Opsi Unduhan:</label>
-          <select id="qualitySelect" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"></select>
-        </div>
-        <div class="border-t border-slate-800/80 pt-3">
-          <button onclick="startDownload()" id="downloadBtn" class="w-full text-center bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-medium text-sm py-3 rounded-xl transition-all shadow-lg active:scale-[0.99] disabled:opacity-50">
-            Klik untuk Unduh Media
-          </button>
-        </div>
-      </div>
-    </div>
+function setBusy(value, message = 'Menyiapkan tautan...') {
+  busy = value;
+  for (const id of ['prepareBtn', 'fileUrl', 'gasEndpoint', 'saveSettings']) el(id).disabled = value;
+  el('loader').hidden = !value;
+  el('loaderText').textContent = message;
+}
 
-    <!-- Error Box -->
-    <div id="errorArea" class="hidden mt-6">
-      <div class="bg-rose-500/10 border border-rose-500/20 rounded-xl p-4 text-xs text-slate-300" id="errorMsg"></div>
-    </div>
+async function callGas(body) {
+  if (!gasUrl) throw new Error('Atur alamat API GAS melalui Pengaturan koneksi terlebih dahulu.');
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 30000);
+  try {
+    // text/plain is CORS-safelisted: GAS has no custom OPTIONS handler.
+    // File URLs go in the POST body, never a JSONP callback or query string.
+    const response = await fetch(gasUrl, {
+      method: 'POST', headers: {'Content-Type': 'text/plain;charset=UTF-8'},
+      body: JSON.stringify(body), redirect: 'follow', credentials: 'omit',
+      signal: controller.signal
+    });
+    if (!response.ok) throw new Error(`API GAS merespons dengan kesalahan (${response.status}).`);
+    let data;
+    try { data = await response.json(); }
+    catch (_) { throw new Error('Respons GAS bukan JSON. Pastikan deployment Web app dapat diakses oleh Anyone dan memakai URL /exec.'); }
+    if (!data || data.success !== true) throw new Error(data?.message || 'Permintaan ditolak oleh GAS.');
+    if (data.service !== 'direct-file-links') throw new Error('Versi API tidak cocok. Deploy Code.gs terbaru.');
+    return data;
+  } catch (error) {
+    if (error.name === 'AbortError') throw new Error('GAS belum merespons setelah 30 detik. Silakan coba lagi.');
+    if (error instanceof TypeError) throw new Error('Tidak dapat menghubungi GAS. Periksa internet, URL /exec, dan akses deployment Anyone.');
+    throw error;
+  } finally { clearTimeout(timer); }
+}
 
-    <!-- Donasi -->
-    <div class="mt-8 border-t border-slate-800/60 pt-4 text-center">
-      <p class="text-xs font-semibold tracking-wide text-slate-400 mb-3">234 + Liong Bulan</p>
-      <div class="flex flex-col sm:flex-row justify-center items-center gap-3">
-        <a href="https://saweria.co/Nyedotdonk" target="_blank" class="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-950 font-medium text-xs transition-all active:scale-[0.97]"><span>☕ Saweria</span></a>
-        <a href="https://trakteer.id/nyedot_donk/tip" target="_blank" class="w-full sm:w-auto flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 hover:bg-rose-500 hover:text-slate-950 font-medium text-xs transition-all active:scale-[0.97]"><span>🌶️ Trakteer</span></a>
-      </div>
-    </div>
+async function saveSettings() {
+  if (busy) return;
+  el('errorArea').hidden = true;
+  clearResult();
+  try { gasUrl = validateEndpoint(el('gasEndpoint').value); }
+  catch (error) { showError(error.message); return; }
+  try { localStorage.setItem(STORAGE_KEY, gasUrl); } catch (_) {}
+  setBusy(true, 'Memeriksa koneksi...');
+  el('connectionStatus').textContent = 'Memeriksa...';
+  try {
+    await callGas({action: 'ping'});
+    el('connectionStatus').textContent = 'Terhubung';
+    el('settings').open = false;
+  } catch (error) {
+    el('connectionStatus').textContent = 'Belum terhubung';
+    showError(error.message);
+  } finally { setBusy(false); }
+}
 
-  </div>
-
-  <script>
-    const PC1_URL = "https://dweller-dollar-available.ngrok-free.dev";
-    const PC2_URL = "https://idealness-endorphin-unfeeling.ngrok-free.dev";
-
-    let pc1Online = false;
-    let pc2Online = false;
-    let activeServer = "";
-
-    function checkServerStatus() {
-      fetch(`${PC1_URL}/ping`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
-        .then(res => res.json())
-        .then(data => {
-          if(data.status === 'online') {
-            pc1Online = true;
-            document.getElementById('statusPc1').className = "px-2 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 text-[10px]";
-            document.getElementById('statusPc1').innerText = "ONLINE";
-          }
-        })
-        .catch(() => {
-          pc1Online = false;
-          document.getElementById('statusPc1').className = "px-2 py-0.5 rounded font-bold bg-rose-500/10 text-rose-400 text-[10px]";
-          document.getElementById('statusPc1').innerText = "OFFLINE";
-        });
-
-      fetch(`${PC2_URL}/ping`, { headers: { 'ngrok-skip-browser-warning': 'true' } })
-        .then(res => res.json())
-        .then(data => {
-          if(data.status === 'online') {
-            pc2Online = true;
-            document.getElementById('statusPc2').className = "px-2 py-0.5 rounded font-bold bg-emerald-500/10 text-emerald-400 text-[10px]";
-            document.getElementById('statusPc2').innerText = "ONLINE";
-          }
-        })
-        .catch(() => {
-          pc2Online = false;
-          document.getElementById('statusPc2').className = "px-2 py-0.5 rounded font-bold bg-rose-500/10 text-rose-400 text-[10px]";
-          document.getElementById('statusPc2').innerText = "OFFLINE";
-        });
+async function prepareDownload(event) {
+  event?.preventDefault();
+  if (busy) return;
+  el('errorArea').hidden = true;
+  clearResult();
+  let url;
+  try { url = inputUrl(el('fileUrl').value); }
+  catch (error) { showError(error.message); return; }
+  if (!gasUrl) { el('settings').open = true; showError('Masukkan alamat API GAS di Pengaturan koneksi.'); return; }
+  setBusy(true);
+  try {
+    const data = await callGas({action: 'prepare', url});
+    const file = data.file;
+    if (!file || inputUrl(file.url) !== url || typeof file.name !== 'string' || typeof file.kind !== 'string') {
+      throw new Error('Data tautan dari GAS tidak sesuai. Coba deploy ulang Code.gs terbaru.');
     }
+    prepared = file;
+    el('fileName').textContent = file.name;
+    el('fileHost').textContent = new URL(url).hostname;
+    el('fileKind').textContent = file.kind;
+    el('fileNote').textContent = file.note || 'Isi dan ketersediaan file belum diperiksa.';
+    el('downloadBtn').href = url;
+    el('downloadBtn').download = file.name;
+    el('resultArea').hidden = false;
+    el('connectionStatus').textContent = 'Terhubung';
+  } catch (error) { showError(error.message); }
+  finally { setBusy(false); }
+}
 
-    window.onload = checkServerStatus;
+async function copyLink() {
+  if (!prepared) return;
+  const current = prepared;
+  try {
+    await navigator.clipboard.writeText(current.url);
+    if (prepared === current) el('copyStatus').textContent = 'Tautan disalin.';
+  } catch (_) {
+    if (prepared === current) el('copyStatus').textContent = 'Tidak bisa menyalin otomatis. Salin tautan dari kolom di atas.';
+  }
+}
 
-    function generateLink() {
-      var url = document.getElementById('videoUrl').value.trim();
-      var btn = document.getElementById('btnDownload');
-      var loader = document.getElementById('loader');
-      var resultArea = document.getElementById('resultArea');
-      var errorArea = document.getElementById('errorArea');
-      var loaderText = document.getElementById('loaderText');
+function initialize() {
+  let saved = '';
+  try { saved = localStorage.getItem(STORAGE_KEY) || ''; } catch (_) {}
+  const configured = window.APP_CONFIG?.GAS_URL || '';
+  // A saved endpoint is a per-browser override of the public deployment config.
+  const endpoint = saved || configured;
+  if (endpoint) {
+    try {
+      gasUrl = validateEndpoint(endpoint);
+      el('gasEndpoint').value = gasUrl;
+      el('connectionStatus').textContent = 'Siap digunakan';
+    } catch (error) { showError(error.message); }
+  }
+  if (!gasUrl) el('settings').open = true;
+  el('fileForm').addEventListener('submit', prepareDownload);
+  el('settingsForm').addEventListener('submit', event => { event.preventDefault(); void saveSettings(); });
+  el('fileUrl').addEventListener('input', clearResult);
+  el('copyBtn').addEventListener('click', copyLink);
+}
+window.addEventListener('DOMContentLoaded', initialize);
 
-      if (!url) { alert('Masukkan link media terlebih dahulu!'); return; }
-
-      if (pc1Online) {
-        activeServer = PC1_URL;
-        loaderText.innerText = "Memproses lewat SERVER 1...";
-      } else if (pc2Online) {
-        activeServer = PC2_URL;
-        loaderText.innerText = "Memproses lewat SERVER 2...";
-      } else {
-        alert("Kedua server SERVER kamu sedang OFFLINE.");
-        return;
-      }
-
-      btn.disabled = true;
-      loader.classList.remove('hidden');
-      resultArea.classList.add('hidden');
-      errorArea.classList.add('hidden');
-
-      fetch(`${activeServer}/get-link`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true'
-        },
-        body: JSON.stringify({ url: url })
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Server merespon dengan error.');
-        return response.json();
-      })
-      .then(data => {
-        btn.disabled = false;
-        loader.classList.add('hidden');
-        
-        if (data.success) {
-          document.getElementById('videoTitle').innerText = data.title;
-          document.getElementById('videoThumb').src = data.thumbnail || 'https://via.placeholder.com/120x80?text=No+Image';
-          
-          var select = document.getElementById('qualitySelect');
-          select.innerHTML = ''; 
-          
-          data.formats.forEach(function(item) {
-            var option = document.createElement('option');
-            option.value = item.format_id; 
-            option.text = item.quality;
-            select.appendChild(option);
-          });
-          
-          resultArea.classList.remove('hidden');
-        } else {
-          document.getElementById('errorMsg').innerText = data.message;
-          errorArea.classList.add('hidden'); // Fix toggle
-          errorArea.classList.remove('hidden');
-        }
-      })
-      .catch(() => {
-        btn.disabled = false;
-        loader.classList.add('hidden');
-        document.getElementById('errorMsg').innerText = 'Gagal terhubung ke server.';
-        errorArea.classList.remove('hidden');
-        checkServerStatus();
-      });
-    }
-
-    function startDownload() {
-      var url = document.getElementById('videoUrl').value.trim();
-      var formatId = document.getElementById('qualitySelect').value;
-      var dBtn = document.getElementById('downloadBtn');
-
-      dBtn.disabled = true;
-      dBtn.innerText = "Sedang Mengunduh dari Server...";
-
-      fetch(`${activeServer}/download`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'ngrok-skip-browser-warning': 'true'
-        },
-        body: JSON.stringify({ url: url, format_id: formatId })
-      })
-      .then(response => {
-        if (!response.ok) throw new Error('Gagal mengunduh file.');
-        return response.blob();
-      })
-      .then(blob => {
-        var blobUrl = window.URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = blobUrl;
-        a.download = "media_downloaded.mp4";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        
-        dBtn.disabled = false;
-        dBtn.innerText = "Klik untuk Unduh Media";
-      })
-      .catch(() => {
-        alert("Gagal mengunduh file dari server.");
-        dBtn.disabled = false;
-        dBtn.innerText = "Klik untuk Unduh Media";
-      });
-    }
   </script>
 </body>
 </html>
