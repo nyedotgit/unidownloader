@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="no-referrer">
-  <meta name="description" content="Siapkan unduhan dari tautan file langsung. File diambil browser langsung dari sumbernya.">
-  <title>Unduh File Langsung</title>
+  <meta name="description" content="Unduh video melalui PC atau buka tautan file langsung.">
+  <title>Media Downloader</title>
   <style>
     :root { color-scheme: dark; font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: #e8edf7; background: #090e19; }
     * { box-sizing: border-box; }
@@ -22,13 +22,13 @@
     .formats { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 22px 0 28px; }
     .tag { font-size: .72rem; padding: 5px 10px; color: #b8d7fd; background: #1c2d46; border: 1px solid #304565; border-radius: 7px; }
     label { display: block; font-weight: 600; font-size: .83rem; margin: 0 0 9px; }
-    input { width: 100%; font: inherit; font-size: .88rem; color: #f4f7ff; background: #0b1321; border: 1px solid #35445f; border-radius: 11px; padding: 14px; }
+    input, select { width: 100%; font: inherit; font-size: .88rem; color: #f4f7ff; background: #0b1321; border: 1px solid #35445f; border-radius: 11px; padding: 14px; }
     input::placeholder { color: #8394af; }
-    input:focus, button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid #7db9ff; outline-offset: 3px; }
+    input:focus, select:focus, button:focus-visible, a:focus-visible, summary:focus-visible { outline: 2px solid #7db9ff; outline-offset: 3px; }
     button, .button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 12px 16px; border: 0; border-radius: 11px; font: inherit; font-size: .88rem; font-weight: 650; text-decoration: none; cursor: pointer; }
     .primary { width: 100%; background: #447de9; color: white; margin-top: 14px; }
     .primary:hover { background: #568ef8; }
-    button:disabled, input:disabled { opacity: .55; cursor: wait; }
+    button:disabled, input:disabled, select:disabled { opacity: .55; cursor: wait; }
     .help { margin: 9px 0 0; font-size: .77rem; color: #aab8cf; }
     .loading { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 24px 0 4px; font-size: .85rem; color: #b8d7fd; }
     .spinner { width: 22px; height: 22px; border: 2px solid #29446c; border-top-color: #89b9ff; border-radius: 50%; animation: spin .8s linear infinite; }
@@ -62,17 +62,34 @@
   <main>
     <header>
       <div class="icon" aria-hidden="true"><svg width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg></div>
-      <h1>Unduh File Langsung</h1>
-      <p class="subtitle muted">Tempel tautan file, lalu buka atau simpan dari sumbernya. Tanpa aplikasi tambahan.</p>
-      <div class="formats" aria-label="Contoh jenis file"><span class="tag">MP4 / WEBM</span><span class="tag">MP3 / M4A</span><span class="tag">PDF</span><span class="tag">GAMBAR</span><span class="tag">ZIP</span></div>
+      <h1>Media Downloader</h1>
+      <p class="subtitle muted">Unduh video dan audio melalui PC Anda, atau buka tautan file langsung.</p>
+      <div class="formats" aria-label="Contoh jenis file"><span class="tag">YOUTUBE</span><span class="tag">TIKTOK</span><span class="tag">INSTAGRAM</span><span class="tag">VIDEO / AUDIO</span><span class="tag">FILE LANGSUNG</span></div>
     </header>
     <form id="fileForm" novalidate>
-      <label for="fileUrl">Tautan file langsung</label>
-      <input type="url" id="fileUrl" inputmode="url" autocomplete="off" spellcheck="false" maxlength="8192" placeholder="https://contoh.com/video.mp4" aria-describedby="urlHelp" required>
-      <p class="help" id="urlHelp">Gunakan alamat file, bukan halaman YouTube, Instagram, TikTok, atau postingan media sosial.</p>
-      <button id="prepareBtn" class="primary" type="submit">Siapkan Unduhan</button>
+      <label for="mode">Jenis unduhan</label>
+      <select id="mode" style="margin-bottom:18px"><option value="video">Video / audio melalui PC</option><option value="file">Tautan file langsung (tanpa PC)</option></select>
+      <div id="accessArea" style="margin-bottom:18px">
+        <label for="accessKey">Kunci akses aplikasi</label>
+        <input id="accessKey" type="password" autocomplete="off" placeholder="Kunci dari pemilik aplikasi">
+        <p class="help">Kunci hanya digunakan pada sesi ini dan tidak disimpan di browser.</p>
+      </div>
+      <label for="fileUrl">Tautan video atau file</label>
+      <input type="url" id="fileUrl" inputmode="url" autocomplete="off" spellcheck="false" maxlength="4096" placeholder="Tempel tautan video atau file di sini" aria-describedby="urlHelp" required>
+      <p class="help" id="urlHelp">Tempel link YouTube atau platform yang didukung. PC pemroses harus menyala.</p>
+      <button id="prepareBtn" class="primary" type="submit">Analisis Video &amp; Kualitas</button>
     </form>
     <div id="loader" class="loading" role="status" hidden><span class="spinner" aria-hidden="true"></span><span id="loaderText">Menyiapkan tautan...</span></div>
+    <section id="videoArea" class="result" aria-live="polite" hidden>
+      <div class="result-top"><span class="eyebrow">Media ditemukan</span></div>
+      <h2 id="videoTitle"></h2>
+      <label for="qualitySelect" style="margin-top:18px">Pilih kualitas</label>
+      <select id="qualitySelect"></select>
+      <p id="videoNote" class="small muted"></p>
+      <button id="videoDownloadBtn" type="button" class="download" style="width:100%">Unduh Media</button>
+      <p class="save-help">Biarkan PC dan ngrok menyala sampai selesai. Video privat, ber-DRM, atau situs yang membatasi akses mungkin tidak dapat diunduh.</p>
+      <p id="downloadStatus" class="small" role="status"></p>
+    </section>
     <section id="resultArea" class="result" aria-live="polite" hidden>
       <div class="result-top"><span class="eyebrow">Tautan siap dibuka</span><span id="fileKind"></span></div>
       <h2 id="fileName"></h2>
@@ -107,6 +124,7 @@ const el = id => document.getElementById(id);
 const STORAGE_KEY = 'direct-file-gas-url';
 let busy = false;
 let prepared = null;
+let analyzed = null;
 let gasUrl = '';
 
 function validateEndpoint(value) {
@@ -118,34 +136,33 @@ function validateEndpoint(value) {
 }
 
 function inputUrl(value) {
+  if (typeof value !== 'string') throw new Error('Alamat media tidak valid.');
   const input = value.trim();
-  if (!input || input.length > 8192 || /[\s\\\x00-\x1f\x7f]/.test(input)) {
-    throw new Error('Masukkan tautan file yang valid; gunakan %20 untuk spasi.');
-  }
+  if (!input || input.length > 4096 || /[\s\\\x00-\x1f\x7f]/.test(input)) throw new Error('Masukkan tautan yang valid; gunakan %20 untuk spasi.');
   let parsed;
-  try { parsed = new URL(input); } catch (_) { throw new Error('Alamat file tidak valid.'); }
+  try { parsed = new URL(input); } catch (_) { throw new Error('Alamat media tidak valid.'); }
   if (!['https:', 'http:'].includes(parsed.protocol) || parsed.username || parsed.password) {
     throw new Error('Gunakan tautan HTTP atau HTTPS tanpa nama pengguna/kata sandi.');
   }
   return input;
 }
 
-function showError(message) {
-  el('errorMsg').textContent = message;
-  el('errorArea').hidden = false;
-}
+function showError(message) { el('errorMsg').textContent = message; el('errorArea').hidden = false; }
 
 function clearResult() {
   prepared = null;
+  analyzed = null;
   el('resultArea').hidden = true;
+  el('videoArea').hidden = true;
   el('downloadBtn').removeAttribute('href');
   el('downloadBtn').removeAttribute('download');
   el('copyStatus').textContent = '';
+  el('downloadStatus').textContent = '';
 }
 
 function setBusy(value, message = 'Menyiapkan tautan...') {
   busy = value;
-  for (const id of ['prepareBtn', 'fileUrl', 'gasEndpoint', 'saveSettings']) el(id).disabled = value;
+  for (const id of ['prepareBtn', 'fileUrl', 'gasEndpoint', 'saveSettings', 'mode', 'accessKey', 'qualitySelect', 'videoDownloadBtn']) el(id).disabled = value;
   el('loader').hidden = !value;
   el('loaderText').textContent = message;
 }
@@ -153,24 +170,21 @@ function setBusy(value, message = 'Menyiapkan tautan...') {
 async function callGas(body) {
   if (!gasUrl) throw new Error('Atur alamat API GAS melalui Pengaturan koneksi terlebih dahulu.');
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 30000);
+  const timer = setTimeout(() => controller.abort(), body.action === 'analyze' ? 150000 : 30000);
   try {
-    // text/plain is CORS-safelisted: GAS has no custom OPTIONS handler.
-    // File URLs go in the POST body, never a JSONP callback or query string.
     const response = await fetch(gasUrl, {
       method: 'POST', headers: {'Content-Type': 'text/plain;charset=UTF-8'},
-      body: JSON.stringify(body), redirect: 'follow', credentials: 'omit',
-      signal: controller.signal
+      body: JSON.stringify(body), redirect: 'follow', credentials: 'omit', signal: controller.signal
     });
     if (!response.ok) throw new Error(`API GAS merespons dengan kesalahan (${response.status}).`);
     let data;
     try { data = await response.json(); }
-    catch (_) { throw new Error('Respons GAS bukan JSON. Pastikan deployment Web app dapat diakses oleh Anyone dan memakai URL /exec.'); }
+    catch (_) { throw new Error('Respons GAS bukan JSON. Deploy Code.gs terbaru dengan akses Anyone dan URL /exec.'); }
     if (!data || data.success !== true) throw new Error(data?.message || 'Permintaan ditolak oleh GAS.');
-    if (data.service !== 'direct-file-links') throw new Error('Versi API tidak cocok. Deploy Code.gs terbaru.');
+    if (data.service !== 'media-gateway') throw new Error('Versi API tidak cocok. Deploy Code.gs terbaru.');
     return data;
   } catch (error) {
-    if (error.name === 'AbortError') throw new Error('GAS belum merespons setelah 30 detik. Silakan coba lagi.');
+    if (error.name === 'AbortError') throw new Error('Permintaan ke GAS melewati batas waktu. Periksa PC dan coba lagi.');
     if (error instanceof TypeError) throw new Error('Tidak dapat menghubungi GAS. Periksa internet, URL /exec, dan akses deployment Anyone.');
     throw error;
   } finally { clearTimeout(timer); }
@@ -183,16 +197,25 @@ async function saveSettings() {
   try { gasUrl = validateEndpoint(el('gasEndpoint').value); }
   catch (error) { showError(error.message); return; }
   try { localStorage.setItem(STORAGE_KEY, gasUrl); } catch (_) {}
-  setBusy(true, 'Memeriksa koneksi...');
+  setBusy(true, 'Memeriksa koneksi GAS...');
   el('connectionStatus').textContent = 'Memeriksa...';
   try {
     await callGas({action: 'ping'});
-    el('connectionStatus').textContent = 'Terhubung';
+    el('connectionStatus').textContent = 'GAS terhubung';
     el('settings').open = false;
-  } catch (error) {
-    el('connectionStatus').textContent = 'Belum terhubung';
-    showError(error.message);
-  } finally { setBusy(false); }
+  } catch (error) { el('connectionStatus').textContent = 'Belum terhubung'; showError(error.message); }
+  finally { setBusy(false); }
+}
+
+function changeMode() {
+  clearResult();
+  el('errorArea').hidden = true;
+  const video = el('mode').value === 'video';
+  el('accessArea').hidden = !video;
+  el('prepareBtn').textContent = video ? 'Analisis Video & Kualitas' : 'Siapkan Tautan File';
+  el('urlHelp').textContent = video
+    ? 'Tempel link YouTube atau platform yang didukung. PC pemroses harus menyala.'
+    : 'Gunakan tautan file langsung, misalnya .mp4, .mp3, .pdf, atau .zip. Mode ini tidak memerlukan PC.';
 }
 
 async function prepareDownload(event) {
@@ -201,58 +224,117 @@ async function prepareDownload(event) {
   el('errorArea').hidden = true;
   clearResult();
   let url;
-  try { url = inputUrl(el('fileUrl').value); }
-  catch (error) { showError(error.message); return; }
+  try { url = inputUrl(el('fileUrl').value); } catch (error) { showError(error.message); return; }
   if (!gasUrl) { el('settings').open = true; showError('Masukkan alamat API GAS di Pengaturan koneksi.'); return; }
-  setBusy(true);
+  const video = el('mode').value === 'video';
+  const access_key = el('accessKey').value.trim();
+  if (video && !access_key) { showError('Masukkan kunci akses aplikasi untuk memakai PC.'); return; }
+  setBusy(true, video ? 'Menganalisis media melalui PC. Mohon tunggu...' : 'Menyiapkan tautan file...');
   try {
-    const data = await callGas({action: 'prepare', url});
-    const file = data.file;
-    if (!file || inputUrl(file.url) !== url || typeof file.name !== 'string' || typeof file.kind !== 'string') {
-      throw new Error('Data tautan dari GAS tidak sesuai. Coba deploy ulang Code.gs terbaru.');
+    const data = await callGas(video ? {action: 'analyze', url, access_key} : {action: 'prepare', url});
+    if (video) {
+      if (!Array.isArray(data.formats) || !data.formats.length || !['pc1','pc2'].includes(data.server_id)) throw new Error('Pilihan kualitas dari PC tidak valid.');
+      analyzed = {url, server_id: data.server_id};
+      el('videoTitle').textContent = data.title;
+      el('qualitySelect').replaceChildren();
+      for (const format of data.formats) {
+        if (typeof format.format_id !== 'string' || !format.format_id) continue;
+        const option = document.createElement('option');
+        option.value = format.format_id;
+        option.textContent = format.quality;
+        el('qualitySelect').appendChild(option);
+      }
+      if (!el('qualitySelect').value) throw new Error('Tidak ada pilihan kualitas yang valid.');
+      el('videoNote').textContent = data.warning || 'File diproses PC dan dikirim langsung ke browser. Batas file 512 MB.';
+      el('videoArea').hidden = false;
+    } else {
+      const file = data.file;
+      if (!file || inputUrl(file.url) !== url || typeof file.name !== 'string' || typeof file.kind !== 'string') throw new Error('Data tautan dari GAS tidak sesuai.');
+      prepared = file;
+      el('fileName').textContent = file.name;
+      el('fileHost').textContent = new URL(url).hostname;
+      el('fileKind').textContent = file.kind;
+      el('fileNote').textContent = file.note || 'Isi dan ketersediaan file belum diperiksa.';
+      el('downloadBtn').href = url;
+      el('downloadBtn').download = file.name;
+      el('resultArea').hidden = false;
     }
-    prepared = file;
-    el('fileName').textContent = file.name;
-    el('fileHost').textContent = new URL(url).hostname;
-    el('fileKind').textContent = file.kind;
-    el('fileNote').textContent = file.note || 'Isi dan ketersediaan file belum diperiksa.';
-    el('downloadBtn').href = url;
-    el('downloadBtn').download = file.name;
-    el('resultArea').hidden = false;
-    el('connectionStatus').textContent = 'Terhubung';
+    el('connectionStatus').textContent = video ? 'PC merespons' : 'GAS terhubung';
   } catch (error) { showError(error.message); }
   finally { setBusy(false); }
+}
+
+function downloadName(header) {
+  const encoded = header.match(/filename\*=UTF-8''([^;]+)/i);
+  const plain = header.match(/filename="([^"]+)"|filename=([^;]+)/i);
+  let name = plain ? (plain[1] || plain[2]) : 'media';
+  if (encoded) { try { name = decodeURIComponent(encoded[1]); } catch (_) {} }
+  return name.replace(/[\\/\x00-\x1f]/g, '_');
+}
+
+async function downloadVideo() {
+  if (busy || !analyzed) return;
+  const job = {...analyzed, format_id: el('qualitySelect').value};
+  el('errorArea').hidden = true;
+  el('downloadStatus').textContent = '';
+  setBusy(true, 'Meminta izin unduhan...');
+  let timer;
+  try {
+    const ticket = await callGas({action:'ticket', ...job, access_key:el('accessKey').value.trim()});
+    const target = new URL(ticket.download_url);
+    if (target.protocol !== 'https:' || target.username || target.password || target.pathname !== '/download' || target.search || target.hash || typeof ticket.token !== 'string' || !ticket.token) {
+      throw new Error('Alamat unduhan dari GAS tidak valid.');
+    }
+    el('loaderText').textContent = 'PC sedang mengunduh dan menyiapkan file...';
+    const controller = new AbortController();
+    timer = setTimeout(() => controller.abort(), 330000);
+    const response = await fetch(target.href, {
+      method:'POST', headers:{'Content-Type':'application/json','X-Download-Token':ticket.token,'ngrok-skip-browser-warning':'true'},
+      body:JSON.stringify({url:job.url,format_id:job.format_id}), signal:controller.signal, credentials:'omit', redirect:'error'
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(()=>({}));
+      throw new Error(error.message || 'Unduhan gagal. Periksa PC lalu analisis ulang video.');
+    }
+    const blob = await response.blob();
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = objectUrl;
+    anchor.download = downloadName(response.headers.get('Content-Disposition') || '');
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+    el('downloadStatus').textContent = 'File diterima. Periksa daftar unduhan browser.';
+  } catch (error) {
+    showError(error.name === 'AbortError' ? 'Unduhan melewati batas waktu. Coba kualitas lebih kecil.' :
+      error instanceof TypeError ? 'Koneksi ke PC terputus. Pastikan ngrok menyala, lalu coba lagi.' : error.message);
+  } finally { clearTimeout(timer); setBusy(false); }
 }
 
 async function copyLink() {
   if (!prepared) return;
   const current = prepared;
-  try {
-    await navigator.clipboard.writeText(current.url);
-    if (prepared === current) el('copyStatus').textContent = 'Tautan disalin.';
-  } catch (_) {
-    if (prepared === current) el('copyStatus').textContent = 'Tidak bisa menyalin otomatis. Salin tautan dari kolom di atas.';
-  }
+  try { await navigator.clipboard.writeText(current.url); if (prepared === current) el('copyStatus').textContent = 'Tautan disalin.'; }
+  catch (_) { if (prepared === current) el('copyStatus').textContent = 'Salin tautan dari kolom di atas.'; }
 }
 
 function initialize() {
   let saved = '';
   try { saved = localStorage.getItem(STORAGE_KEY) || ''; } catch (_) {}
-  const configured = window.APP_CONFIG?.GAS_URL || '';
-  // A saved endpoint is a per-browser override of the public deployment config.
-  const endpoint = saved || configured;
+  const endpoint = saved || window.APP_CONFIG?.GAS_URL || '';
   if (endpoint) {
-    try {
-      gasUrl = validateEndpoint(endpoint);
-      el('gasEndpoint').value = gasUrl;
-      el('connectionStatus').textContent = 'Siap digunakan';
-    } catch (error) { showError(error.message); }
+    try { gasUrl = validateEndpoint(endpoint); el('gasEndpoint').value = gasUrl; el('connectionStatus').textContent = 'Siap digunakan'; }
+    catch (error) { showError(error.message); }
   }
   if (!gasUrl) el('settings').open = true;
+  changeMode();
   el('fileForm').addEventListener('submit', prepareDownload);
   el('settingsForm').addEventListener('submit', event => { event.preventDefault(); void saveSettings(); });
   el('fileUrl').addEventListener('input', clearResult);
+  el('mode').addEventListener('change', changeMode);
   el('copyBtn').addEventListener('click', copyLink);
+  el('videoDownloadBtn').addEventListener('click', downloadVideo);
 }
 window.addEventListener('DOMContentLoaded', initialize);
 
